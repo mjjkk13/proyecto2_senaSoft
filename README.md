@@ -76,4 +76,4 @@ Desarrolladora participante en la competencia **SENASOFT** categoría **Mujeres 
 
 ## 📄 Licencia  
 Este proyecto se desarrolla con fines académicos en el marco de **SENASOFT**.  
-"""
+
