@@ -1,4 +1,4 @@
-readme_content = """# 🚲 PedaleaYa  
+# 🚲 PedaleaYa  
 **Sistema de información para la gestión de alquiler de bicicletas y promoción de ciclopaseos**  
 
 Proyecto en desarrollo como preparación para la competencia **SENASOFT**. El SENA ha destinado **100 bicicletas** distribuidas en las regionales participantes, y este sistema busca administrar de forma eficiente dichos recursos.  
