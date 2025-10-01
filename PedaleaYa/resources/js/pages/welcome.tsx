@@ -4,29 +4,18 @@ import {
   faBars,
   faBicycle,
   faTimes,
-  faMapMarkedAlt,
   faCalendarAlt,
   faShieldAlt,
   faClock,
-  faChartLine,
-  faUsers,
   faLeaf,
   faMobileAlt,
   faCheckCircle,
   faMoneyBillWave,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "@inertiajs/react";
 
 export default function SENABikesLanding() {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  function handleSubscribe(e: { preventDefault: () => void; }) {
-    e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-    setTimeout(() => setSubscribed(false), 5000);
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -37,7 +26,10 @@ export default function SENABikesLanding() {
             {/* Logo SENA */}
             <div className="flex items-center gap-3">
               <div className="bg-white rounded-full p-2">
-                <FontAwesomeIcon icon={faBicycle} className="text-2xl text-green-600" />
+                <FontAwesomeIcon
+                  icon={faBicycle}
+                  className="text-2xl text-green-600"
+                />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">PedaleaYa</h1>
@@ -47,18 +39,19 @@ export default function SENABikesLanding() {
 
             {/* Desktop Nav */}
             <nav className="hidden md:flex gap-6 items-center">
-              <a className="hover:text-yellow-300 transition" href="#beneficios">
-                Beneficios
-              </a>
-              <a className="hover:text-yellow-300 transition" href="#eventos">
+              <a className="hover:text-yellow-300 transition" href="/eventos">
                 Ciclopaseos
               </a>
-              <a className="hover:text-yellow-300 transition" href="#tarifas">
+              <a className="hover:text-yellow-300 transition" href="/tarifas">
                 Tarifas
               </a>
-              <button className="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-300 hover:text-green-800 transition">
+              {/* Iniciar Sesión */}
+              <Link
+                href="/ingreso"
+                className="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-300 hover:text-green-800 transition"
+              >
                 Iniciar Sesión
-              </button>
+              </Link>
             </nav>
 
             {/* Mobile Button */}
@@ -76,18 +69,20 @@ export default function SENABikesLanding() {
           {/* Mobile Menu */}
           {menuOpen && (
             <div className="md:hidden mt-4 pb-4 space-y-3 border-t border-green-500 pt-4">
-              <a href="#beneficios" className="block hover:text-yellow-300">
-                Beneficios
-              </a>
+
               <a href="#eventos" className="block hover:text-yellow-300">
                 Ciclopaseos
               </a>
-              <a href="#tarifas" className="block hover:text-yellow-300">
+              <a href="/tarifas" className="block hover:text-yellow-300">
                 Tarifas
               </a>
-              <button className="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold w-full">
+              {/* Iniciar Sesión */}
+              <Link
+                href="/ingreso"
+                className="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold w-full text-center"
+              >
                 Iniciar Sesión
-              </button>
+              </Link>
             </div>
           )}
         </div>
@@ -105,17 +100,18 @@ export default function SENABikesLanding() {
                 <span className="text-yellow-300">SENA</span>
               </h2>
               <p className="text-lg opacity-95 mb-6">
-                Plataforma digital para funcionarios y aprendices del SENA. Alquila bicicletas, 
-                participa en ciclopaseos y contribuye a la movilidad sostenible.
+                Plataforma digital para funcionarios y aprendices del SENA.
+                Alquila bicicletas, participa en ciclopaseos y contribuye a la
+                movilidad sostenible.
               </p>
 
               <div className="flex flex-wrap gap-4 mb-8">
-                <button className="bg-yellow-300 text-green-800 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition shadow-lg">
+                <Link
+                  href="/tarifas"
+                  className="bg-yellow-300 text-green-800 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition shadow-lg"
+                >
                   Alquilar Ahora
-                </button>
-                <button className="bg-white text-green-800 bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition">
-                  Ver Mapa de Bicicletas
-                </button>
+                </Link>
               </div>
 
               {/* Stats */}
@@ -311,21 +307,25 @@ export default function SENABikesLanding() {
         </div>
       </section>
 
-      {/* CTA SECTION */}
+       {/* CTA SECTION */}
       <section className="py-16 bg-gradient-to-r from-green-700 to-green-600 text-white">
         <div className="container mx-auto px-6 text-center">
           <h3 className="text-3xl font-bold mb-4">
             ¿Listo para comenzar a pedalear?
           </h3>
           <p className="text-lg mb-8 opacity-95 max-w-2xl mx-auto">
-            Únete al sistema de movilidad sostenible del SENA. Regístrate ahora y comienza 
-            a disfrutar de todos los beneficios.
+            Únete al sistema de movilidad sostenible del SENA. Regístrate ahora
+            y comienza a disfrutar de todos los beneficios.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <button className="bg-yellow-300 text-green-800 px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-400 transition shadow-xl">
+            {/* Registrarse Ahora → /registro */}
+            <Link
+              href="/registro"
+              className="bg-yellow-300 text-green-800 px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-400 transition shadow-xl"
+            >
               Registrarse Ahora
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -352,7 +352,7 @@ export default function SENABikesLanding() {
               <ul className="space-y-2 text-sm">
 
                 <li><a href="#eventos" className="hover:text-green-400 transition">Ciclopaseos</a></li>
-                <li><a href="#tarifas" className="hover:text-green-400 transition">Tarifas</a></li>
+                <li><a href="/tarifas" className="hover:text-green-400 transition">Tarifas</a></li>
               </ul>
             </div>
 
