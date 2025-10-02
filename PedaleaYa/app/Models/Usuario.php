@@ -3,17 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable; // Importante: para que funcione Auth
+use Illuminate\Foundation\Auth\User as Authenticatable; // Necesario para login/logout/reset
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\ResetPasswordNotification;
 
 class Usuario extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
     protected $table = 'usuarios';
     protected $primaryKey = 'usuario_id';
-    public $timestamps = false; // tu tabla no usa created_at / updated_at
+    public $timestamps = false; // si tu tabla no tiene created_at / updated_at
 
     protected $fillable = [
         'nombre',
@@ -27,9 +32,12 @@ class Usuario extends Authenticatable
 
     protected $hidden = [
         'password',
+        'remember_token', // 👈 agrega esto si tu tabla lo tiene
     ];
 
-    // RELACIONES
+    /**
+     * Relaciones
+     */
     public function rol()
     {
         return $this->belongsTo(Rol::class, 'rol_id', 'rol_id');

@@ -70,7 +70,7 @@ export default function SENABikesLanding() {
           {menuOpen && (
             <div className="md:hidden mt-4 pb-4 space-y-3 border-t border-green-500 pt-4">
 
-              <a href="#eventos" className="block hover:text-yellow-300">
+              <a href="/eventos" className="block hover:text-yellow-300">
                 Ciclopaseos
               </a>
               <a href="/tarifas" className="block hover:text-yellow-300">
@@ -351,7 +351,7 @@ export default function SENABikesLanding() {
               <h4 className="font-bold text-white mb-4">Enlaces Rápidos</h4>
               <ul className="space-y-2 text-sm">
 
-                <li><a href="#eventos" className="hover:text-green-400 transition">Ciclopaseos</a></li>
+                <li><a href="/eventos" className="hover:text-green-400 transition">Ciclopaseos</a></li>
                 <li><a href="/tarifas" className="hover:text-green-400 transition">Tarifas</a></li>
               </ul>
             </div>

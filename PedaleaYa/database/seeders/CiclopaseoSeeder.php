@@ -19,7 +19,7 @@ class CiclopaseoSeeder extends Seeder
                 'descripcion' => 'Recorridos guiados por la ciudad todos los domingos a las 7:00 AM.',
                 'fecha_evento' => Carbon::now()->addDays(7),
                 'lugar' => 'Parque Simón Bolívar, Bogotá',
-                'creado_por' => 1, // 👈 asegúrate de que exista un usuario con usuario_id = 1
+                'creado_por' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
