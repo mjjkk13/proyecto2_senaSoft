@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\Settings\PasswordController;
 
 // ==================
 // RUTAS PÚBLICAS

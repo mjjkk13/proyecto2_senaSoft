@@ -1,12 +1,8 @@
-import NewPasswordController from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
-import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { useForm, Head, Link } from '@inertiajs/react';
+import Swal from 'sweetalert2';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBicycle, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import {route} from 'ziggy-js';
 
 interface ResetPasswordProps {
     token: string;
@@ -14,83 +10,128 @@ interface ResetPasswordProps {
 }
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
-    return (
-        <AuthLayout
-            title="Reset password"
-            description="Please enter your new password below"
-        >
-            <Head title="Reset password" />
+    const { data, setData, post, processing, errors, reset } = useForm({
+        email: email || '',
+        token,
+        password: '',
+        password_confirmation: '',
+    });
 
-            <Form
-                {...NewPasswordController.store.form()}
-                transform={(data) => ({ ...data, token, email })}
-                resetOnSuccess={['password', 'password_confirmation']}
-            >
-                {({ processing, errors }) => (
-                    <div className="grid gap-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Validación simple en cliente
+        if (!data.password || !data.password_confirmation) {
+            Swal.fire('Error', 'Debes completar todos los campos.', 'error');
+            return;
+        }
+
+        if (data.password !== data.password_confirmation) {
+            Swal.fire('Error', 'Las contraseñas no coinciden.', 'error');
+            return;
+        }
+
+        post(route('contrasena.reset'), {
+            onSuccess: () => {
+                reset('password', 'password_confirmation');
+                Swal.fire('Éxito', 'Tu contraseña fue restablecida correctamente.', 'success');
+            },
+            onError: () => {
+                Swal.fire('Error', 'Ocurrió un error al restablecer tu contraseña.', 'error');
+            },
+        });
+    };
+
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-base-200">
+            <Head title="Restablecer Contraseña" />
+
+            {/* Logo */}
+      <Link href="/" className="flex items-center gap-3 mb-8">
+            <div className="bg-white rounded-full p-3 shadow-lg">
+                <FontAwesomeIcon icon={faBicycle} className="text-3xl text-green-600" />
+            </div>
+            <div>
+                <h1 className="text-3xl font-extrabold tracking-tight">PedaleaYa</h1>
+                <p className="text-sm opacity-90">Movilidad Sostenible</p>
+            </div>
+        </Link>
+        
+            <div className="card w-full max-w-md shadow-xl bg-base-100">
+                <div className="card-body">
+                    <h2 className="card-title text-center justify-center">
+                        Restablecer contraseña
+                    </h2>
+                    <p className="text-center text-sm text-gray-500">
+                        Ingresa tu nueva contraseña para continuar
+                    </p>
+
+                    <form onSubmit={handleSubmit} className="form-control gap-4 mt-4">
+                        {/* Email */}
+                        <label className="input input-bordered flex items-center gap-2">
+                            <FontAwesomeIcon icon={faEnvelope} />
+                            <input
                                 type="email"
                                 name="email"
-                                autoComplete="email"
-                                value={email}
-                                className="mt-1 block w-full"
+                                value={data.email}
                                 readOnly
+                                className="grow"
                             />
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
-                        </div>
+                        </label>
+                        {errors.email && (
+                            <span className="text-error text-sm">{errors.email}</span>
+                        )}
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
+                        {/* Password */}
+                        <label className="input input-bordered flex items-center gap-2">
+                            <FontAwesomeIcon icon={faLock} />
+                            <input
                                 type="password"
                                 name="password"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                autoFocus
-                                placeholder="Password"
+                                placeholder="Nueva contraseña"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                className="grow"
                             />
-                            <InputError message={errors.password} />
-                        </div>
+                        </label>
+                        {errors.password && (
+                            <span className="text-error text-sm">{errors.password}</span>
+                        )}
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
-                            </Label>
-                            <Input
-                                id="password_confirmation"
+                        {/* Password Confirmation */}
+                        <label className="input input-bordered flex items-center gap-2">
+                            <FontAwesomeIcon icon={faLock} />
+                            <input
                                 type="password"
                                 name="password_confirmation"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                placeholder="Confirm password"
+                                placeholder="Confirmar contraseña"
+                                value={data.password_confirmation}
+                                onChange={(e) => setData('password_confirmation', e.target.value)}
+                                className="grow"
                             />
-                            <InputError
-                                message={errors.password_confirmation}
-                                className="mt-2"
-                            />
-                        </div>
+                        </label>
+                        {errors.password_confirmation && (
+                            <span className="text-error text-sm">
+                                {errors.password_confirmation}
+                            </span>
+                        )}
 
-                        <Button
+                        {/* Submit Button */}
+                        <button
                             type="submit"
-                            className="mt-4 w-full"
+                            className="btn btn-primary mt-4"
                             disabled={processing}
-                            data-test="reset-password-button"
                         >
-                            {processing && (
-                                <LoaderCircle className="h-4 w-4 animate-spin" />
+                            {processing ? (
+                                <span className="loading loading-spinner"></span>
+                            ) : (
+                                'Restablecer contraseña'
                             )}
-                            Reset password
-                        </Button>
-                    </div>
-                )}
-            </Form>
-        </AuthLayout>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     );
 }
+

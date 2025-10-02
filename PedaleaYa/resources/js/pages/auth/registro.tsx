@@ -45,7 +45,7 @@ export default function Registro() {
       <Head title="Registro" />
 
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-8">
+      <Link href="/" className="flex items-center gap-3 mb-8">
         <div className="bg-white rounded-full p-3 shadow-lg">
           <FontAwesomeIcon icon={faBicycle} className="text-3xl text-green-600" />
         </div>
@@ -53,7 +53,7 @@ export default function Registro() {
           <h1 className="text-3xl font-extrabold tracking-tight">PedaleaYa</h1>
           <p className="text-sm opacity-90">Movilidad Sostenible</p>
         </div>
-      </div>
+      </Link>
 
       {/* Card Registro */}
       <form

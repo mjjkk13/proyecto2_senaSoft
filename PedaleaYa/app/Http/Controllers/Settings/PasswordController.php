@@ -1,80 +1,82 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Settings;
 
-use App\Models\Usuario;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\Password;
 
 class PasswordController extends Controller
 {
-    // Solicitar recuperación de contraseña
     public function forgot(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        // Validar que el email exista en tu tabla "usuarios"
+        $request->validate([
+            'email' => ['required', 'email', 'exists:usuarios,email'],
+        ], [
+            'email.exists' => 'El correo ingresado no está registrado en el sistema.',
+        ]);
 
-        $usuario = Usuario::where('email', $request->email)->first();
-        if (!$usuario) {
-            return response()->json(['error' => 'Usuario no encontrado'], 404);
-        }
-
-        $token = Str::random(60);
-
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $usuario->email],
-            ['token' => Hash::make($token), 'created_at' => now()]
+        // Usar el broker de contraseñas configurado para "usuarios"
+        $status = Password::broker('usuarios')->sendResetLink(
+            $request->only('email')
         );
 
-        // Enviar correo con el token
-        Mail::raw("Tu token de recuperación es: $token", function ($message) use ($usuario) {
-            $message->to($usuario->email)->subject('Recuperación de contraseña');
-        });
+        if ($status === Password::RESET_LINK_SENT) {
+            // Devuelve respuesta compatible con Inertia
+            return back()->with('success', __($status));
+        }
 
-        return response()->json(['mensaje' => 'Se ha enviado un correo con el token de recuperación']);
+        return back()->withErrors(['email' => __($status)]);
     }
-
-    // Restablecer contraseña con token
     public function reset(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'token' => 'required|string',
-            'password' => 'required|min:6|confirmed',
+            'token'    => ['required'],
+            'email'    => ['required', 'email', 'exists:usuarios,email'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'email.exists' => 'El correo ingresado no está registrado en el sistema.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
         ]);
 
-        $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+        $status = Password::broker('usuarios')->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($usuario, $password) {
+                $usuario->forceFill([
+                    'password' => Hash::make($password),
+                ])->save();
+            }
+        );
 
-        if (!$record || !Hash::check($request->token, $record->token)) {
-            return response()->json(['error' => 'Token inválido o expirado'], 400);
-        }
-
-        $usuario = Usuario::where('email', $request->email)->first();
-        $usuario->update(['password' => Hash::make($request->password)]);
-
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-
-        return response()->json(['mensaje' => 'Contraseña restablecida correctamente']);
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('ingreso')->with('success', __($status))
+            : back()->withErrors(['email' => __($status)]);
     }
-
-    // Cambiar contraseña (usuario autenticado)
-    public function change(Request $request)
+    /**
+     * Actualizar la contraseña del usuario autenticado.
+     */
+    public function update(Request $request): RedirectResponse
     {
-        $request->validate([
-            'contrasena_actual' => 'required',
-            'nueva_contrasena' => 'required|min:6|confirmed',
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'], 
+            'password' => ['required', Password::defaults(), 'confirmed'],
+        ], [
+            'current_password.required' => 'La contraseña actual es obligatoria.',
+            'current_password.current_password' => 'La contraseña actual es incorrecta.',
+            'password.required' => 'La nueva contraseña es obligatoria.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
         ]);
 
+        // Usuario autenticado
         $usuario = $request->user();
 
-        if (!Hash::check($request->contrasena_actual, $usuario->password)) {
-            return response()->json(['error' => 'La contraseña actual es incorrecta'], 400);
-        }
+        $usuario->update([
+            'password' => Hash::make($validated['password']),
+        ]);
 
-        $usuario->update(['password' => Hash::make($request->nueva_contrasena)]);
-
-        return response()->json(['mensaje' => 'Contraseña actualizada con éxito']);
+        return back()->with('success', 'Contraseña actualizada correctamente.');
     }
 }
